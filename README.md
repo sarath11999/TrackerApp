@@ -1,6 +1,6 @@
 # TrackerApp
 
-A private, offline-first iPhone app for daily habits, spending and weight, built with **React Native + Expo (SDK 58) + TypeScript**. Everything is stored on the device in **SQLite**: no account, no cloud and no internet connection are needed.
+A private, offline-first iPhone app for daily habits, spending and weight, built with **React Native + Expo (SDK 58) + TypeScript**. Everything is stored on the device in **SQLite**: the app itself needs no account, cloud service or internet connection. Loading it through Expo Go needs a free Expo sign-in (see step 4).
 
 ## Features
 
@@ -55,7 +55,27 @@ npm install
 
 Install **Expo Go** from the App Store. It must support **SDK 58**. If Expo Go says the project's SDK is incompatible, update Expo Go.
 
-### 4. Start the development server
+### 4. Sign in to Expo (required for Expo Go on iPhone)
+
+Since Expo Go 57, opening a project from a development server on a **physical iPhone** needs the **same free Expo account** in both Expo CLI and Expo Go. Without it, Expo Go shows *"You need to be signed in to Expo Go and Expo CLI to open your project."*
+
+1. Create a free account at <https://expo.dev/signup> (skip this if you already have one).
+2. Sign in on the Mac:
+
+   ```bash
+   npx expo login
+   ```
+
+3. Check which account the CLI is using:
+
+   ```bash
+   npx expo whoami
+   ```
+
+4. In **Expo Go** on the iPhone, tap the account icon (top-right) and sign in with the **same** account.
+5. If you signed in after starting the server, tap **Try again** in Expo Go. If you signed in with a different account, restart `npx expo start`.
+
+### 5. Start the development server
 
 ```bash
 npx expo start
@@ -63,7 +83,7 @@ npx expo start
 
 A QR code appears in the terminal.
 
-### 5. Open the app
+### 6. Open the app
 
 1. Connect the iPhone and the Mac to the **same Wi-Fi network**.
 2. Open the iPhone **Camera** app, point it at the QR code, and tap the **"Open in Expo Go"** banner.
@@ -81,6 +101,22 @@ npx expo start --tunnel
 - Data lives in a SQLite database (`trackerapp.db`) inside Expo Go's sandbox on the phone. It survives closing and restarting the app.
 - Once loaded, the app works without internet. Expo Go only needs the Mac to *load or reload* the JavaScript. For a fully standalone app, see the development build section below.
 - Use **Settings → Export Backup (JSON)** regularly. Deleting Expo Go deletes its data.
+
+## Use it without the Mac: published to EAS Update (Expo Go)
+
+The app is published to the Expo project **@sarathdeva/trackerapp** with EAS Update (runtime `exposdk:58.0.0`), so Expo Go can open it without `npx expo start`. Since May 2026, only the project owner can load it, so you must be signed in to Expo Go as **sarathdeva**.
+
+- **Open it:** scan the branch QR code with the iPhone Camera, or open this link on the phone:
+  `exp://u.expo.dev/50bb26d7-64fc-4bb0-b331-6ce6be8b5875/branch/01a1cd57-a788-7431-a0b2-7452be70f5ca`
+  It always loads the newest update on the `main` branch. After the first open, it's also listed under **Projects** on Expo Go's home screen.
+- **Publish a new version** after changing the code:
+
+  ```bash
+  npm run publish:ios
+  ```
+
+  Expo Go downloads the new version the next time you open the app (reopen it once more if you still see the old version).
+- **Data:** the published app has its own storage, separate from the `npx expo start` dev copy. Move data with **Settings → Export Backup (JSON)**, then **Import Backup (JSON)**.
 
 ## Optional: standalone development build
 
@@ -105,7 +141,7 @@ npx eas-cli@latest build --profile development --platform ios
 | `npm run typecheck` | TypeScript check |
 | `npx expo lint` | ESLint (Expo config with React Compiler rules) |
 | `npx expo-doctor` | Check Expo dependencies and config |
-| `npx expo start --web` | Optional browser preview (SQLite runs via WebAssembly; notifications, sharing and native alerts are not available on web) |
+| `npx expo start --web` | Optional browser preview (SQLite runs via WebAssembly, so keep the app open in **one tab only**; notifications, sharing and native confirmation alerts are not available on web) |
 
 ### Project structure
 

@@ -1,9 +1,11 @@
 import { useEffect, useState, type ReactNode } from 'react';
-import { Animated, Easing, View } from 'react-native';
+import { Animated, Easing, Platform, View } from 'react-native';
 import Svg, { Circle, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { useColors } from '@/state/AppContext';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
+// On web, Animated injects `collapsable={false}` into the raw <circle> element (React DOM warning), so draw it statically there.
+const IS_WEB = Platform.OS === 'web';
 
 let gradientSeq = 0;
 
@@ -35,6 +37,7 @@ export function ProgressRing({
   const [anim] = useState(() => new Animated.Value(clamped));
 
   useEffect(() => {
+    if (IS_WEB) return;
     Animated.timing(anim, { toValue: clamped, duration: 650, easing: Easing.out(Easing.cubic), useNativeDriver: false }).start();
   }, [clamped, anim]);
 
@@ -56,18 +59,33 @@ export function ProgressRing({
           </LinearGradient>
         </Defs>
         <Circle cx={size / 2} cy={size / 2} r={r} stroke={track ?? c.ringTrack} strokeWidth={stroke} fill="none" />
-        <AnimatedCircle
-          cx={size / 2}
-          cy={size / 2}
-          r={r}
-          stroke={`url(#${id})`}
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          fill="none"
-          strokeDasharray={`${circumference} ${circumference}`}
-          strokeDashoffset={dashoffset}
-          opacity={clamped === 0 ? 0 : 1}
-        />
+        {IS_WEB ? (
+          <Circle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            stroke={`url(#${id})`}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            fill="none"
+            strokeDasharray={`${circumference} ${circumference}`}
+            strokeDashoffset={circumference * (1 - clamped / 100)}
+            opacity={clamped === 0 ? 0 : 1}
+          />
+        ) : (
+          <AnimatedCircle
+            cx={size / 2}
+            cy={size / 2}
+            r={r}
+            stroke={`url(#${id})`}
+            strokeWidth={stroke}
+            strokeLinecap="round"
+            fill="none"
+            strokeDasharray={`${circumference} ${circumference}`}
+            strokeDashoffset={dashoffset}
+            opacity={clamped === 0 ? 0 : 1}
+          />
+        )}
       </Svg>
       {children}
     </View>

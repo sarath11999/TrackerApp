@@ -79,6 +79,9 @@ export const EXPENSE_COLORS: Record<string, string> = {
   Other: '#8E8E93',
 };
 
+/** Max content width so layouts stay phone-shaped on wide screens (web preview, iPad). */
+export const MAX_CONTENT_WIDTH = 600;
+
 export const radius = { sm: 10, md: 14, lg: 20, xl: 28 };
 export const spacing = { xs: 4, sm: 8, md: 12, lg: 16, xl: 20, xxl: 28 };
 

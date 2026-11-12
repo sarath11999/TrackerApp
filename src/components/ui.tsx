@@ -18,7 +18,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/state/AppContext';
-import { radius, spacing, type } from '@/theme/theme';
+import { MAX_CONTENT_WIDTH, radius, spacing, type } from '@/theme/theme';
 
 export type IconType = ComponentType<{ size?: number; color?: string; strokeWidth?: number }>;
 
@@ -93,15 +93,19 @@ export function Screen({
     );
   }
   return (
-    <ScrollView
-      style={{ flex: 1, backgroundColor: c.background }}
-      contentContainerStyle={[{ paddingTop: top, paddingBottom: spacing.xxl * 2, paddingHorizontal: spacing.lg }, contentStyle]}
-      keyboardShouldPersistTaps="handled"
-      {...rest}
-    >
-      {header}
-      {children}
-    </ScrollView>
+    <View style={{ flex: 1, backgroundColor: c.background }}>
+      <ScrollView
+        style={{ flex: 1, backgroundColor: c.background }}
+        contentContainerStyle={[{ paddingTop: top, paddingBottom: spacing.xxl * 2, paddingHorizontal: spacing.lg, width: '100%', maxWidth: MAX_CONTENT_WIDTH, alignSelf: 'center' }, contentStyle]}
+        keyboardShouldPersistTaps="handled"
+        {...rest}
+      >
+        {header}
+        {children}
+      </ScrollView>
+      {/* Keeps scrolled content from running underneath the clock and battery icons. */}
+      {!noTopInset ? <View pointerEvents="none" style={[styles.statusBackdrop, { height: insets.top, backgroundColor: c.background }]} /> : null}
+    </View>
   );
 }
 
@@ -360,6 +364,7 @@ export function ProgressBar({ value, color, height = 8, track }: { value: number
 }
 
 const styles = StyleSheet.create({
+  statusBackdrop: { position: 'absolute', top: 0, left: 0, right: 0 },
   header: { flexDirection: 'row', alignItems: 'flex-end', marginBottom: spacing.lg, gap: spacing.sm },
   subtitle: { fontWeight: '600', marginBottom: 2 },
   card: { borderRadius: radius.lg, borderCurve: 'continuous' },

@@ -20,10 +20,15 @@ const RANGES: { value: Range; label: string }[] = [
   { value: 'all', label: 'All' },
 ];
 
+/** Axis label from a cents value; keeps one decimal when the step isn't whole (e.g. $2.5). */
 const axisDollars = (v: string) => {
   const n = Number(v) / 100;
-  return n >= 1000 ? `$${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k` : `$${Math.round(n)}`;
+  if (n >= 1000) return `$${(n / 1000).toFixed(n >= 10000 ? 0 : 1)}k`;
+  return Number.isInteger(n) ? `$${n}` : `$${n.toFixed(n < 10 ? 1 : 0)}`;
 };
+
+/** Bar top label: exact cents under $100, whole dollars above. */
+const barValue = (cents: number) => (cents < 10_000 ? formatCents(cents) : axisDollars(String(cents)));
 
 export default function MoneyScreen() {
   const c = useColors();
@@ -133,7 +138,7 @@ export default function MoneyScreen() {
 
           <SectionTitle>6-Month Trend</SectionTitle>
           <Card>
-            <Bars data={trend.map((m) => ({ label: parseDateKey(`${m.month}-01`).toLocaleDateString(undefined, { month: 'short' }), value: m.cents }))} color={c.money} formatY={axisDollars} showValues formatValue={(v) => axisDollars(String(v))} />
+            <Bars data={trend.map((m) => ({ label: parseDateKey(`${m.month}-01`).toLocaleDateString(undefined, { month: 'short' }), value: m.cents }))} color={c.money} formatY={axisDollars} showValues formatValue={barValue} />
           </Card>
 
           <SectionTitle>Transactions</SectionTitle>

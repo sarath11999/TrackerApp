@@ -29,6 +29,8 @@ function ThemedStack() {
           headerTintColor: c.tint,
           headerTitleStyle: { color: c.text },
           headerShadowVisible: false,
+          // iOS uses view-controller-based status bar appearance, so the navigator owns the style.
+          statusBarStyle: c.dark ? 'light' : 'dark',
           headerBackButtonDisplayMode: 'minimal',
           contentStyle: { backgroundColor: c.background },
         }}

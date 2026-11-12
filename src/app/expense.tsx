@@ -8,7 +8,7 @@ import { Button, Card, Divider, haptic, T } from '@/components/ui';
 import { addExpense, deleteExpense, getExpense, updateExpense, validateExpense } from '@/db/repo';
 import { centsToInput, EXPENSE_CATEGORIES, parseDollarsToCents, type ExpenseCategory } from '@/lib/money';
 import { useApp, useColors } from '@/state/AppContext';
-import { EXPENSE_COLORS, radius, spacing } from '@/theme/theme';
+import { EXPENSE_COLORS, MAX_CONTENT_WIDTH, radius, spacing } from '@/theme/theme';
 
 /** Add or edit an expense (modal). */
 export default function ExpenseScreen() {
@@ -91,14 +91,14 @@ export default function ExpenseScreen() {
           title: id === null ? 'New Expense' : 'Edit Expense',
           headerStyle: { backgroundColor: c.background },
           headerLeft: () => (
-            <Pressable onPress={() => goBack('/money')} hitSlop={10} accessibilityRole="button">
+            <Pressable onPress={() => goBack('/money')} hitSlop={10} accessibilityRole="button" style={styles.headerBtn}>
               <T variant="body" color={c.tint}>
                 Cancel
               </T>
             </Pressable>
           ),
           headerRight: () => (
-            <Pressable onPress={save} disabled={saving || !loaded} hitSlop={10} accessibilityRole="button">
+            <Pressable onPress={save} disabled={saving || !loaded} hitSlop={10} accessibilityRole="button" style={styles.headerBtn}>
               <T variant="headline" color={c.tint}>
                 Save
               </T>
@@ -106,7 +106,7 @@ export default function ExpenseScreen() {
           ),
         }}
       />
-      <ScrollView contentContainerStyle={{ padding: spacing.lg, gap: spacing.lg }} keyboardShouldPersistTaps="handled">
+      <ScrollView contentContainerStyle={{ padding: spacing.lg, gap: spacing.lg, width: '100%', maxWidth: MAX_CONTENT_WIDTH, alignSelf: 'center' }} keyboardShouldPersistTaps="handled">
         <Card style={{ alignItems: 'center', paddingVertical: spacing.xxl }}>
           <T variant="footnote" secondary style={{ fontWeight: '600' }}>
             AMOUNT (USD)
@@ -185,6 +185,8 @@ export default function ExpenseScreen() {
 }
 
 const styles = StyleSheet.create({
+  // iOS adds header margins natively; web needs explicit padding so the buttons aren't flush with the edges.
+  headerBtn: { paddingHorizontal: Platform.OS === 'web' ? spacing.lg : 0, minHeight: 44, justifyContent: 'center' },
   amountRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: spacing.sm },
   amountInput: { fontSize: 48, fontWeight: '700', textAlign: 'center', fontVariant: ['tabular-nums'] },
   label: { fontWeight: '600', marginBottom: spacing.sm, marginLeft: spacing.lg },
